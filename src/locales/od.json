@@ -1,0 +1,11 @@
+{
+  "demo": {
+    "decrement": "ହ୍ରାସ କର",
+    "increment": "ବୃଦ୍ଧି କର",
+    "incrementValue": "ବୃଦ୍ଧି କର",
+    "decrementValue": "ହ୍ରାସ ମୂଲ୍ୟ",
+    "currentLocale" : "ସାମ୍ପ୍ରତିକ ଲୋକାଲ୍ : {locale}",
+    "defaultLocale": "ଡିଫଲ୍ଟ ଲୋକାଲ୍ : {defaultLocale}",
+    "configuredLocales": "ବିନ୍ୟାସିତ ଲୋକାଲ୍ ଗୁଡ଼ିକ : {locales}"
+  }
+}

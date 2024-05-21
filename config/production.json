@@ -1,0 +1,10 @@
+{
+  "name": "Enfix-Customer",
+  "version": "1.0.0",
+  "baseUrl": "https://api.enfix.io",
+  "cookieName": "enfix-token-prod",
+  "google": {
+    "clientId": "1005610909780-kv91n8ram40d83d5go5a3ctu49h0ip0g.apps.googleusercontent.com"
+  },
+  "webUrl": "https://app.enfix.io"
+}

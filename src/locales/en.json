@@ -1,0 +1,11 @@
+{
+  "demo": {
+    "decrement": "Decrement",
+    "increment": "Increment",
+    "incrementValue": "Increment value",
+    "decrementValue": "Decrement value",
+    "currentLocale" : "Current locale : {locale}",
+    "defaultLocale": "Default locale: {defaultLocale}",
+    "configuredLocales": "Configured locales: {locales}"
+  }
+}

@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Preparation'){
+            steps{
+                echo 'Starting Preparation Phase'
+                sh 'sudo n 18.18.1'
+                sh 'yarn'
+                sh "perl -i -pe 's/.*/  [key in keyof T]?: PropertyResolver<T, T[key], C> | ReturnType<any>; / if \$.==16' ./node_modules/@feathersjs/schema/lib/resolver.d.ts"
+
+
+                echo 'Preparation Done'
+            }
+        }
+        stage('Build'){
+            steps {
+                echo 'Starting Build Phase'
+                sh 'yarn build'
+                echo 'Build Done'
+            }
+        }
+        stage('Deploy'){
+            steps {
+                echo 'Starting Deploy Phase'
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh_pk',keyFileVariable: 'sshKey')]){
+                    
+                    sh '''
+                        mkdir -p /var/lib/jenkins/.ssh
+                        ssh-keyscan 3.111.153.70 >> /var/lib/jenkins/.ssh/known_hosts
+
+
+                        ssh -i $sshKey ubuntu@3.111.153.70 "mkdir -p /home/ubuntu/deploy/customer_dev"
+                        ssh -i $sshKey ubuntu@3.111.153.70 "mkdir -p /home/ubuntu/deploy/customer_dev/src"
+                        scp -i $sshKey -r .next ubuntu@3.111.153.70:/home/ubuntu/deploy/customer_dev
+                        scp -i $sshKey -r public ubuntu@3.111.153.70:/home/ubuntu/deploy/customer_dev
+                        scp -i $sshKey -r config ubuntu@3.111.153.70:/home/ubuntu/deploy/customer_dev
+
+                        scp -i $sshKey package.json ubuntu@3.111.153.70:/home/ubuntu/deploy/customer_dev
+                        scp -i $sshKey dev.json ubuntu@3.111.153.70:/home/ubuntu/deploy/customer_dev
+                        scp -i $sshKey next.config.js ubuntu@3.111.153.70:/home/ubuntu/deploy/customer_dev
+
+                        ssh -i $sshKey ubuntu@3.111.153.70 "cd /home/ubuntu/deploy/customer_dev/ && yarn"
+                        ssh -i $sshKey ubuntu@3.111.153.70 "perl -i -pe 's/.*/  [key in keyof T]?: PropertyResolver<T, T[key], C> | ReturnType<any>; / if \$.==16' /home/ubuntu/deploy/admin/node_modules/@feathersjs/schema/lib/resolver.d.ts"
+
+
+                        ssh -i $sshKey ubuntu@3.111.153.70 "cd /home/ubuntu/deploy/customer_dev/ && pm2 start dev.json"
+
+                    '''
+
+                }
+            }
+        }
+    }
+    post{
+        success{
+            emailext attachLog: true, body: "${env.JOB_NAME} Build Number ${env.BUILD_NUMBER} by ${env.CHANGE_AUTHOR}  has successfully completed.", recipientProviders: [buildUser()], subject: "Success: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'", to: 'ramakanta@smartters.in'
+        }
+        unsuccessful{
+            emailext attachLog: true, body: "${env.JOB_NAME} Build Number ${env.BUILD_NUMBER} by ${env.CHANGE_AUTHOR}  has error. Please check the log and resolve", recipientProviders: [buildUser()], subject: "${currentBuild.currentResult}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'", to: 'ramakanta@smartters.in'
+        }
+    }
+
+}
+
